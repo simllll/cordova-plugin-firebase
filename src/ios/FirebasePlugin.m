@@ -3,7 +3,6 @@
 #import "AppDelegate.h"
 #import "Firebase.h"
 @import FirebaseInstanceID;
-@import FirebaseMessaging;
 @import FirebaseAnalytics;
 
 static NSString *const CUSTOM_URL_SCHEME = @"hokify.com";
@@ -39,15 +38,6 @@ static NSString *const CUSTOM_URL_SCHEME = @"hokify.com";
 
     [FIROptions defaultOptions].deepLinkURLScheme = CUSTOM_URL_SCHEME;
     [FIRApp configure];
-}
-
-- (void)applicationDidBecomeActive:(NSNotification *)application {
-    [self connectToFcm];
-}
-
-- (void)applicationDidEnterBackground:(NSNotification *)application {
-    [[FIRMessaging messaging] disconnect];
-    NSLog(@"Disconnected from FCM");
 }
 
 - (void)getInstanceId:(CDVInvokedUrlCommand *)command {
@@ -94,24 +84,6 @@ static NSString *const CUSTOM_URL_SCHEME = @"hokify.com";
     }];
 }
 
-- (void)subscribe:(CDVInvokedUrlCommand *)command {
-    NSString* topic = [NSString stringWithFormat:@"/topics/%@", [command.arguments objectAtIndex:0]];
-    
-    [[FIRMessaging messaging] subscribeToTopic: topic];
-    
-    CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
-    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
-}
-
-- (void)unsubscribe:(CDVInvokedUrlCommand *)command {
-    NSString* topic = [NSString stringWithFormat:@"/topics/%@", [command.arguments objectAtIndex:0]];
-    
-    [[FIRMessaging messaging] unsubscribeFromTopic: topic];
-    
-    CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
-    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
-}
-
 - (void)logEvent:(CDVInvokedUrlCommand *)command {
     [self.commandDelegate runInBackground:^{
         NSString* name = [command.arguments objectAtIndex:0];
@@ -135,16 +107,6 @@ static NSString *const CUSTOM_URL_SCHEME = @"hokify.com";
     [self connectToFcm];
     
     // TODO: If necessary send token to appliation server.
-}
-
-- (void)connectToFcm {
-    [[FIRMessaging messaging] connectWithCompletion:^(NSError * _Nullable error) {
-        if (error != nil) {
-            NSLog(@"Unable to connect to FCM. %@", error);
-        } else {
-            NSLog(@"Connected to FCM.");
-        }
-    }];
 }
 
 /*
