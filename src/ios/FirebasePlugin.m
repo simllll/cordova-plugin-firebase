@@ -6,6 +6,7 @@
 @import FirebaseMessaging;
 @import FirebaseAnalytics;
 
+static NSString *const CUSTOM_URL_SCHEME = @"hokify.com";
 
 @implementation FirebasePlugin
 
@@ -27,10 +28,16 @@
                                              selector:@selector(applicationDidEnterBackground:)
                                                  name:UIApplicationDidEnterBackgroundNotification object:nil];
 }
+- (BOOL)application:(UIApplication *)app
+            openURL:(NSURL *)url
+            options:(NSDictionary<NSString *, id> *)options {
+  return [self application:app openURL:url sourceApplication:nil annotation:@{}];
+}
 
 - (void) applicationDidFinishLaunching:(NSNotification *) notification {    
     [[UIApplication sharedApplication] registerForRemoteNotifications];
 
+    [FIROptions defaultOptions].deepLinkURLScheme = CUSTOM_URL_SCHEME;
     [FIRApp configure];
 }
 
