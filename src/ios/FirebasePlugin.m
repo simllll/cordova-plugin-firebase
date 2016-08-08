@@ -19,13 +19,14 @@ static NSString *const CUSTOM_URL_SCHEME = @"hokify.com";
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(tokenRefreshNotification:)
                                                  name:kFIRInstanceIDTokenRefreshNotification object:nil];
     
-    [[NSNotificationCenter defaultCenter] addObserver:self
+/*    [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(applicationDidBecomeActive:)
                                                  name:UIApplicationDidBecomeActiveNotification object:nil];
     
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(applicationDidEnterBackground:)
                                                  name:UIApplicationDidEnterBackgroundNotification object:nil];
+*/
 }
 /*- (BOOL)application:(UIApplication *)app
             openURL:(NSURL *)url
@@ -102,9 +103,6 @@ static NSString *const CUSTOM_URL_SCHEME = @"hokify.com";
     // should be done.
     NSString *refreshedToken = [[FIRInstanceID instanceID] token];
     NSLog(@"InstanceID token: %@", refreshedToken);
-    
-    // Connect to FCM since connection may have failed when attempted before having a token.
-    [self connectToFcm];
     
     // TODO: If necessary send token to appliation server.
 }
