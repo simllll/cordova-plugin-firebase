@@ -35,8 +35,6 @@ static NSString *const CUSTOM_URL_SCHEME = @"hokify.com";
 }*/
 
 - (void) applicationDidFinishLaunching:(NSNotification *) notification {    
-    [[UIApplication sharedApplication] registerForRemoteNotifications];
-
     [FIROptions defaultOptions].deepLinkURLScheme = CUSTOM_URL_SCHEME;
     [FIRApp configure];
 }
