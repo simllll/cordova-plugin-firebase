@@ -128,10 +128,10 @@ static NSString *const CUSTOM_URL_SCHEME = @"hokify";
 
 @implementation AppDelegate (FirebasePlugin)
 
-void MyMethodSwizzle(Class c, SEL originalSelector) {
+void FirebaseMethodSwizzle(Class c, SEL originalSelector) {
     NSString *selectorString = NSStringFromSelector(originalSelector);
-    SEL newSelector = NSSelectorFromString([@"swizzled_" stringByAppendingString:selectorString]);
-    SEL noopSelector = NSSelectorFromString([@"noop_" stringByAppendingString:selectorString]);
+    SEL newSelector = NSSelectorFromString([@"swizzledFirebase_" stringByAppendingString:selectorString]);
+    SEL noopSelector = NSSelectorFromString([@"noopFirebase_" stringByAppendingString:selectorString]);
     Method originalMethod, newMethod, noop;
     originalMethod = class_getInstanceMethod(c, originalSelector);
     newMethod = class_getInstanceMethod(c, newSelector);
@@ -146,16 +146,16 @@ void MyMethodSwizzle(Class c, SEL originalSelector) {
 + (void)load
 {
     NSLog(@"Load FirebasePlugin");
-    MyMethodSwizzle([self class], @selector(application:openURL:sourceApplication:annotation:));
-    MyMethodSwizzle([self class], @selector(application:continueUserActivity:restorationHandler:));
+    FirebaseMethodSwizzle([self class], @selector(application:openURL:sourceApplication:annotation:));
+    FirebaseMethodSwizzle([self class], @selector(application:continueUserActivity:restorationHandler:));
 }
 
-- (void)noop_application:(UIApplication *)application
+- (void)noopFirebase_application:(UIApplication *)application
     continueUserActivity:(NSUserActivity *)userActivity
       restorationHandler:(void (^)(NSArray *))restorationHandler {
 }
 
-- (void)swizzled_application:(UIApplication *)application
+- (void)swizzledFirebase_application:(UIApplication *)application
         continueUserActivity:(NSUserActivity *)userActivity
           restorationHandler:(void (^)(NSArray *))restorationHandler {
     
@@ -169,7 +169,7 @@ void MyMethodSwizzle(Class c, SEL originalSelector) {
      }];
     
     // Call existing method
-    [self swizzled_application:application continueUserActivity:userActivity restorationHandler:restorationHandler];
+    [self swizzledFirebase_application:application continueUserActivity:userActivity restorationHandler:restorationHandler];
 }
 
 - (void)noop_application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation
