@@ -2,6 +2,8 @@
 #import <Cordova/CDV.h>
 #import "AppDelegate.h"
 #import "Firebase.h"
+#import <objc/runtime.h>
+
 @import FirebaseInstanceID;
 @import FirebaseAnalytics;
 @import FirebaseDynamicLinks;
@@ -175,7 +177,7 @@ continueUserActivity:(NSUserActivity *)userActivity
 {
     FIRDynamicLink *dynamicLink =
     [[FIRDynamicLinks dynamicLinks] dynamicLinkFromCustomSchemeURL:url];
-
+
     // Call existing method
     [self swizzled_application:application openURL:url sourceApplication:sourceApplication annotation:annotation];
 }
