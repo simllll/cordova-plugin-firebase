@@ -4,6 +4,7 @@
 #import "Firebase.h"
 @import FirebaseInstanceID;
 @import FirebaseAnalytics;
+@import FirebaseDynamicLinks;
 
 static NSString *const CUSTOM_URL_SCHEME = @"hokify.com";
 
