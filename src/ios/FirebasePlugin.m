@@ -119,5 +119,63 @@ static NSString *const CUSTOM_URL_SCHEME = @"hokify.com";
   NSLog(@"%@", userInfo);
 }
 */
+@end
 
+
+#pragma mark - AppDelegate Overrides
+
+@implementation AppDelegate (FirebasePlugin)
+
+void MyMethodSwizzle(Class c, SEL originalSelector) {
+    NSString *selectorString = NSStringFromSelector(originalSelector);
+    SEL newSelector = NSSelectorFromString([@"swizzled_" stringByAppendingString:selectorString]);
+    SEL noopSelector = NSSelectorFromString([@"noop_" stringByAppendingString:selectorString]);
+    Method originalMethod, newMethod, noop;
+    originalMethod = class_getInstanceMethod(c, originalSelector);
+    newMethod = class_getInstanceMethod(c, newSelector);
+    noop = class_getInstanceMethod(c, noopSelector);
+    if (class_addMethod(c, originalSelector, method_getImplementation(newMethod), method_getTypeEncoding(newMethod))) {
+        class_replaceMethod(c, newSelector, method_getImplementation(originalMethod) ?: method_getImplementation(noop), method_getTypeEncoding(originalMethod));
+    } else {
+        method_exchangeImplementations(originalMethod, newMethod);
+    }
+}
+
++ (void)load
+{
+    MyMethodSwizzle([self class], @selector(application:openURL:sourceApplication:annotation:));
+}
+
+- (void)noop_application:(UIApplication *)application
+        continueUserActivity:(NSUserActivity *)userActivity
+          restorationHandler:(void (^)(NSArray *))restorationHandler {
+}
+
+- (void)swizzled_application:(UIApplication *)application
+continueUserActivity:(NSUserActivity *)userActivity
+ restorationHandler:(void (^)(NSArray *))restorationHandler {
+    
+    [[FIRDynamicLinks dynamicLinks]
+                    handleUniversalLink:userActivity.webpageURL
+                    completion:^(FIRDynamicLink * _Nullable dynamicLink,
+                                 NSError * _Nullable error) {
+                        // ...
+                    }];
+    
+    // Call existing method
+    [self swizzled_application:application continueUserActivity:userActivity restorationHandler:restorationHandler];
+}
+
+- (void)noop_application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation
+{
+}
+
+- (void)swizzled_application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation
+{
+    FIRDynamicLink *dynamicLink =
+    [[FIRDynamicLinks dynamicLinks] dynamicLinkFromCustomSchemeURL:url];
+
+    // Call existing method
+    [self swizzled_application:application openURL:url sourceApplication:sourceApplication annotation:annotation];
+}
 @end
