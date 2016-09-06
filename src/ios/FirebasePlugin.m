@@ -165,11 +165,18 @@ void MyMethodSwizzle(Class c, SEL originalSelector) {
      handleUniversalLink:userActivity.webpageURL
      completion:^(FIRDynamicLink * _Nullable dynamicLink,
                   NSError * _Nullable error) {
-         // ...
+         if(dynamicLink != NULL && dynamicLink.url != NULL)
+         {
+             NSLog(@"handleUniversalLink");
+             
+             // all plugins will get the notification, and their handlers will be called - again with new url
+             [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:CDVPluginHandleOpenURLNotification object:dynamicLink.url]];
+         }
      }];
     
     // Call existing method
     [self swizzled_application:application continueUserActivity:userActivity restorationHandler:restorationHandler];
+    
 }
 
 - (void)noop_application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation
