@@ -147,6 +147,7 @@ void FirebaseMethodSwizzle(Class c, SEL originalSelector) {
 {
     NSLog(@"Load FirebasePlugin");
     FirebaseMethodSwizzle([self class], @selector(application:openURL:sourceApplication:annotation:));
+    FirebaseMethodSwizzle([self class], @selector(application:openURL:options:));
     FirebaseMethodSwizzle([self class], @selector(application:continueUserActivity:restorationHandler:));
 }
 
@@ -186,9 +187,35 @@ void FirebaseMethodSwizzle(Class c, SEL originalSelector) {
 {
     NSLog(@"Firebase plugin openURL");
     
-    [[FIRDynamicLinks dynamicLinks] dynamicLinkFromCustomSchemeURL:url];
+    FIRDynamicLink *dynamicLink = [[FIRDynamicLinks dynamicLinks] dynamicLinkFromCustomSchemeURL:url];
+    if (dynamicLink && dynamicLink.url != NULL) {
+        // all plugins will get the notification, and their handlers will be called - again with new url
+        [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:CDVPluginHandleOpenURLNotification object:dynamicLink.url]];
+        
+        return YES;
+    }
     
     // Call existing method
     [self swizzledFirebase_application:application openURL:url sourceApplication:sourceApplication annotation:annotation];
+}
+
+- (void)noopFirebase_application:(UIApplication *)app
+            openURL:(NSURL *)url
+            options:(NSDictionary<NSString *, id> *)options {
+}
+
+- (void)swizzledFirebase_application:(UIApplication *)app
+            openURL:(NSURL *)url
+            options:(NSDictionary<NSString *, id> *)options {
+            
+    FIRDynamicLink *dynamicLink = [[FIRDynamicLinks dynamicLinks] dynamicLinkFromCustomSchemeURL:url];
+    if (dynamicLink && dynamicLink.url != NULL) {
+        // all plugins will get the notification, and their handlers will be called - again with new url
+        [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:CDVPluginHandleOpenURLNotification object:dynamicLink.url]];
+             
+        return YES;
+    }
+  
+    [self swizzledFirebase_application:application openURL:url options:options];
 }
 @end
