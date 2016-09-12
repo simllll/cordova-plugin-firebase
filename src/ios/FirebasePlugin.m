@@ -191,8 +191,6 @@ void FirebaseMethodSwizzle(Class c, SEL originalSelector) {
     if (dynamicLink && dynamicLink.url != NULL) {
         // all plugins will get the notification, and their handlers will be called - again with new url
         [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:CDVPluginHandleOpenURLNotification object:dynamicLink.url]];
-        
-        return YES;
     }
     
     // Call existing method
@@ -212,8 +210,6 @@ void FirebaseMethodSwizzle(Class c, SEL originalSelector) {
     if (dynamicLink && dynamicLink.url != NULL) {
         // all plugins will get the notification, and their handlers will be called - again with new url
         [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:CDVPluginHandleOpenURLNotification object:dynamicLink.url]];
-             
-        return YES;
     }
   
     [self swizzledFirebase_application:application openURL:url options:options];
