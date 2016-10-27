@@ -7,7 +7,7 @@
 @import FirebaseAnalytics;
 @import FirebaseDynamicLinks;
 
-static NSString *const CUSTOM_URL_SCHEME = @"hokify";
+static NSString *const CUSTOM_URL_SCHEME = @"com.jobswipr.hokify";
 
 @implementation FirebasePlugin
 
