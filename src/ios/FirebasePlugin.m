@@ -212,6 +212,6 @@ void FirebaseMethodSwizzle(Class c, SEL originalSelector) {
         [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:CDVPluginHandleOpenURLNotification object:dynamicLink.url]];
     }
   
-    [self swizzledFirebase_application:application openURL:url options:options];
+    [self swizzledFirebase_application:app openURL:url options:options];
 }
 @end
